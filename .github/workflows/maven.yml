@@ -33,8 +33,8 @@ jobs:
         uses: actions/setup-java@v1
         with:
           java-version: 11
-      - name: Build with Maven
+      - name: Deploy with Maven
         run: |
           mkdir -p ~/.m2
-          echo "<settings><servers><server><id>github</id><username>UECIT</username><password>${GITHUB_TOKEN}</password></server></servers></settings>" > ~/.m2/settings.xml
+          echo "<settings><servers><server><id>github</id><username>${{ github.actor }}</username><password>{{secrets.GITHUB_TOKEN}}</password></server></servers></settings>" > ~/.m2/settings.xml
           mvn -B deploy --file pom.xml

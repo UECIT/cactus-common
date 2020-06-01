@@ -43,7 +43,7 @@ public class TokenAuthenticationService {
    * @param request to extract authentication from
    * @see #getAuthentication(HttpServletRequest)
    */
-  public void authenicateRequestContext(HttpServletRequest request) {
+  public void authenticateRequestContext(HttpServletRequest request) {
     Authentication authentication = getAuthentication(request);
     if (authentication != null) {
       SecurityContextHolder.getContext().setAuthentication(authentication);

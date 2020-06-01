@@ -23,7 +23,7 @@ public class JWTFilter extends GenericFilterBean {
   @Override
   public void doFilter(ServletRequest request, ServletResponse response, FilterChain filterChain)
       throws IOException, ServletException {
-    authService.authenicateRequestContext((HttpServletRequest) request);
+    authService.authenticateRequestContext((HttpServletRequest) request);
     filterChain.doFilter(request, response);
   }
 }

@@ -4,8 +4,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
 
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Clock;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.impl.DefaultJws;
+import java.util.Collections;
 import javax.servlet.http.HttpServletRequest;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -13,6 +15,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.http.HttpHeaders;
+import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.mock.web.MockServletContext;
 import org.springframework.security.core.Authentication;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
@@ -22,6 +25,9 @@ public class TokenAuthenticationServiceTest {
 
   @Mock
   JWTHandler jwtHandler;
+
+  @Mock
+  Clock clock;
 
   @InjectMocks
   TokenAuthenticationService authService;
@@ -80,6 +86,25 @@ public class TokenAuthenticationServiceTest {
     Authentication auth = authService.getAuthentication(bearerTokenRequest());
 
     assertThat(auth).isNull();
+  }
+
+  @Test
+  public void issuesToken() {
+
+    when(jwtHandler.generate(JWTRequest.builder()
+        .username("user")
+        .supplierId("supplier")
+        .secondsUntilExpiry(TokenAuthenticationService.SECONDS_UNTIL_EXPIRY)
+        .build()))
+        .thenReturn("token");
+
+    MockHttpServletResponse response = new MockHttpServletResponse();
+    authService.setAuthentication(response, "user", "supplier", Collections.emptyList());
+
+    assertThat(response.containsHeader(HttpHeaders.AUTHORIZATION)).isTrue();
+
+    String header = response.getHeader(HttpHeaders.AUTHORIZATION);
+    assertThat(header).isEqualTo("Bearer token");
   }
 
 }

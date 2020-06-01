@@ -5,10 +5,12 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.MalformedJwtException;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -26,6 +28,7 @@ public class TokenAuthenticationService {
 
   private final JWTHandler jwtHandler;
 
+  static final long SECONDS_UNTIL_EXPIRY = 864_000; // 10 days
   private static final String TOKEN_PREFIX = "Bearer ";
   private static final String HEADER_STRING = "Authorization";
   private static final String ROLE_STRING = "Roles";
@@ -52,7 +55,7 @@ public class TokenAuthenticationService {
    *
    * @return the supplier ID from the current security context, or empty if not available
    */
-  public static Optional<String> getCurrentSupplierId() {
+  public Optional<String> getCurrentSupplierId() {
     return Optional.ofNullable(SecurityContextHolder.getContext().getAuthentication())
         .map(Authentication::getPrincipal)
         .filter(CactusPrincipal.class::isInstance)
@@ -66,7 +69,7 @@ public class TokenAuthenticationService {
    *
    * @param supplierId identifies the expected supplier
    */
-  public static void requireSupplierId(String supplierId) {
+  public void requireSupplierId(String supplierId) {
     if (!getCurrentSupplierId().map(supplierId::equals).orElse(false)) {
       throw new AuthenticationException();
     }
@@ -78,8 +81,33 @@ public class TokenAuthenticationService {
    *
    * @return the current supplierId
    */
-  public static String requireSupplierId() {
+  public String requireSupplierId() {
     return getCurrentSupplierId().orElseThrow(AuthenticationException::new);
+  }
+
+  /**
+   * Adds authentication to a response by setting the Authorization header
+   *
+   * @param response           add authentication token to response
+   * @param username           user to be identified by token
+   * @param supplierId         supplier to be identified by token
+   * @param grantedAuthorities roles associated with the user
+   */
+  public void setAuthentication(
+      HttpServletResponse response, String username, String supplierId,
+      Collection<? extends GrantedAuthority> grantedAuthorities) {
+    var roles = grantedAuthorities.stream()
+        .map(GrantedAuthority::getAuthority)
+        .collect(Collectors.toUnmodifiableList());
+
+    String jwt = jwtHandler.generate(JWTRequest.builder()
+        .username(username)
+        .supplierId(supplierId)
+        .roles(roles)
+        .secondsUntilExpiry(SECONDS_UNTIL_EXPIRY)
+        .build());
+    response.addHeader(HEADER_STRING, TOKEN_PREFIX + jwt);
+    response.addHeader(ROLE_STRING, String.join(COMMA_SEPARATOR, roles));
   }
 
   /**

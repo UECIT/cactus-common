@@ -31,8 +31,9 @@ public class TokenAuthenticationService {
   static final long SECONDS_UNTIL_EXPIRY = 864_000; // 10 days
   private static final String TOKEN_PREFIX = "Bearer ";
   private static final String HEADER_STRING = "Authorization";
-  private static final String ROLE_STRING = "Roles";
   private static final String COMMA_SEPARATOR = ",";
+
+  private static final String ROLES_CLAIM = "roles";
   private static final String SUPPLIER_ID_CLAIM = "supplierId";
 
 
@@ -107,7 +108,7 @@ public class TokenAuthenticationService {
         .secondsUntilExpiry(SECONDS_UNTIL_EXPIRY)
         .build());
     response.addHeader(HEADER_STRING, TOKEN_PREFIX + jwt);
-    response.addHeader(ROLE_STRING, String.join(COMMA_SEPARATOR, roles));
+    response.addHeader(ROLES_CLAIM, String.join(COMMA_SEPARATOR, roles));
   }
 
   /**
@@ -128,7 +129,7 @@ public class TokenAuthenticationService {
       Jws<Claims> jws = jwtHandler.parse(token);
       Claims claims = jws.getBody();
       List<? extends GrantedAuthority> roles =
-          Optional.ofNullable(claims.get(ROLE_STRING, String.class))
+          Optional.ofNullable(claims.get(ROLES_CLAIM, String.class))
               .stream()
               .map(r -> r.split(COMMA_SEPARATOR))
               .flatMap(Arrays::stream)

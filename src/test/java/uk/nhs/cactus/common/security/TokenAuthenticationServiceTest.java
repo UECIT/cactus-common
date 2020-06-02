@@ -8,6 +8,7 @@ import io.jsonwebtoken.Clock;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.impl.DefaultJws;
 import java.util.Collections;
+import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -18,6 +19,8 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.mock.web.MockServletContext;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -42,6 +45,14 @@ public class TokenAuthenticationServiceTest {
     Claims claims = Jwts.claims();
     claims.setSubject("user");
     claims.put("supplierId", "supplier");
+    return claims;
+  }
+
+  private Claims validRolesClaims() {
+    Claims claims = Jwts.claims();
+    claims.setSubject("user");
+    claims.put("supplierId", "supplier");
+    claims.put("roles", "ADMIN,SUPER_ADMIN");
     return claims;
   }
 
@@ -105,6 +116,18 @@ public class TokenAuthenticationServiceTest {
 
     String header = response.getHeader(HttpHeaders.AUTHORIZATION);
     assertThat(header).isEqualTo("Bearer token");
+  }
+
+  @Test
+  public void parsesRoles() {
+    when(jwtHandler.parse("token")).thenReturn(new DefaultJws<>(null, validRolesClaims(), null));
+    Authentication auth = authService.getAuthentication(bearerTokenRequest());
+
+    assertThat(auth).isNotNull();
+    assertThat(auth.getAuthorities()).hasSize(2);
+    assertThat(auth.getAuthorities().containsAll(List.of(
+        new SimpleGrantedAuthority("ADMIN"),
+        new SimpleGrantedAuthority("SUPER_ADMIN")))).isTrue();
   }
 
 }

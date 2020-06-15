@@ -19,7 +19,6 @@ import java.time.ZoneOffset;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
-import org.apache.commons.codec.binary.Base64;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -44,14 +43,14 @@ public class JWTHandlerTest {
     handler = new JWTHandler(clock);
     ReflectionTestUtils.setField(handler, "jwtSecret", TEST_SECRET);
 
-    parser = Jwts.parser().setSigningKey(Base64.encodeBase64(TEST_SECRET.getBytes()));
+    parser = Jwts.parser().setSigningKey(TEST_SECRET.getBytes());
   }
 
   @Test
   public void parse_withCorrectJwt_hasRightSecret() {
     var jwt = Jwts.builder()
         .claim("a", "b")
-        .signWith(SignatureAlgorithm.HS512, Base64.encodeBase64(TEST_SECRET.getBytes()))
+        .signWith(SignatureAlgorithm.HS512, TEST_SECRET.getBytes())
         .compact();
 
     Jws<Claims> jws = handler.parse(jwt);
@@ -64,7 +63,7 @@ public class JWTHandlerTest {
   public void parse_withInvalidSecret_rejected() {
     var jwt = Jwts.builder()
         .claim("a", "b")
-        .signWith(SignatureAlgorithm.HS512, Base64.encodeBase64(INVALID_SECRET.getBytes()))
+        .signWith(SignatureAlgorithm.HS512, INVALID_SECRET.getBytes())
         .compact();
 
     expectedException.expect(SignatureException.class);

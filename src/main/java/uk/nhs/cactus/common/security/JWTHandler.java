@@ -8,7 +8,6 @@ import io.jsonwebtoken.SignatureAlgorithm;
 import java.time.Clock;
 import java.util.Date;
 import lombok.RequiredArgsConstructor;
-import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
@@ -24,7 +23,8 @@ public class JWTHandler {
   private String jwtSecret;
 
   public Jws<Claims> parse(String jwt) {
-    return Jwts.parser().setSigningKey(Base64.encodeBase64(jwtSecret.getBytes()))
+    return Jwts.parser()
+        .setSigningKey(jwtSecret.getBytes())
         .parseClaimsJws(jwt);
   }
 
@@ -48,7 +48,7 @@ public class JWTHandler {
 
     return builder
         .setSubject(request.getUsername())
-        .signWith(SignatureAlgorithm.HS512, Base64.encodeBase64(jwtSecret.getBytes()))
+        .signWith(SignatureAlgorithm.HS512, jwtSecret.getBytes())
         .compact();
   }
 }

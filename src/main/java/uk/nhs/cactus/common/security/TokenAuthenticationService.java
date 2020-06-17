@@ -73,7 +73,7 @@ public class TokenAuthenticationService {
    *                authentication token is present
    */
   public void requireSupplierId(String supplierId) {
-    if (requireSupplierId().equals(supplierId)) {
+    if (!requireSupplierId().equals(supplierId)) {
       throw new ForbiddenOperationException("Forbidden");
     }
   }

@@ -3,6 +3,8 @@ package uk.nhs.cactus.common.security;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
 
+import ca.uhn.fhir.rest.server.exceptions.AuthenticationException;
+import ca.uhn.fhir.rest.server.exceptions.ForbiddenOperationException;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Clock;
 import io.jsonwebtoken.Jwts;
@@ -19,8 +21,8 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.mock.web.MockServletContext;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -130,4 +132,17 @@ public class TokenAuthenticationServiceTest {
         new SimpleGrantedAuthority("SUPER_ADMIN")))).isTrue();
   }
 
+  @Test(expected = AuthenticationException.class)
+  public void throwsAuthenticationExceptionWhenInvalidToken() {
+    SecurityContextHolder.getContext().setAuthentication(null);
+    authService.requireSupplierId();
+  }
+
+
+  @Test(expected = ForbiddenOperationException.class)
+  public void throwsForbiddenExceptionWhenUnexpectedSupplierId() {
+    when(jwtHandler.parse("token")).thenReturn(new DefaultJws<>(null, validClaims(), null));
+    SecurityContextHolder.getContext().setAuthentication(authService.getAuthentication(bearerTokenRequest()));
+    authService.requireSupplierId("something");
+  }
 }

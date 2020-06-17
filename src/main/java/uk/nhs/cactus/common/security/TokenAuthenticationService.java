@@ -1,6 +1,7 @@
 package uk.nhs.cactus.common.security;
 
 import ca.uhn.fhir.rest.server.exceptions.AuthenticationException;
+import ca.uhn.fhir.rest.server.exceptions.ForbiddenOperationException;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.MalformedJwtException;
@@ -65,22 +66,23 @@ public class TokenAuthenticationService {
   }
 
   /**
-   * Throws an {@link ca.uhn.fhir.rest.server.exceptions.AuthenticationException} if the provided
-   * supplierId does not match the current request's authentication token
-   *
    * @param supplierId identifies the expected supplier
+   * @throws {@link ca.uhn.fhir.rest.server.exceptions.ForbiddenOperationException} if the provided
+   *                supplierId does not match the current request's authentication token
+   * @throws {@link ca.uhn.fhir.rest.server.exceptions.AuthenticationException} if no valid
+   *                authentication token is present
    */
   public void requireSupplierId(String supplierId) {
-    if (!getCurrentSupplierId().map(supplierId::equals).orElse(false)) {
-      throw new AuthenticationException();
+    if (!requireSupplierId().equals(supplierId)) {
+      throw new ForbiddenOperationException("Forbidden");
     }
   }
 
   /**
-   * Requires that a supplier is currently authenticated, throwing an {@link
-   * AuthenticationException} if not.
+   * Requires that a supplier is currently authenticated
    *
    * @return the current supplierId
+   * @throws {@link AuthenticationException} if not able to authenticate
    */
   public String requireSupplierId() {
     return getCurrentSupplierId().orElseThrow(AuthenticationException::new);

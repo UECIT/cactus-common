@@ -2,6 +2,7 @@ package uk.nhs.cactus.common.security;
 
 import static org.apache.commons.lang3.StringUtils.trimToNull;
 
+import com.google.common.base.Preconditions;
 import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
@@ -17,15 +18,13 @@ import org.springframework.web.util.UriComponentsBuilder;
  * Used to obtain the appropriate token to use for calling a particular url.
  * This depends on two app properties:
  * - cactus.servers: comma-separated list of urls known to accept the 'cactus' token
- *   - when not set or set to '*': assumes that all valid urls accept the 'cactus' token
  * - cactus.auth.server: url to the authentication server called for the actual token exchange
- *   - required only if cactus.servers is configured as a list of urls
  */
 @Component
 @RequiredArgsConstructor
 public class TokenExchange {
 
-  @Value("#{'${cactus.servers:*}' == '*' ? null : '${cactus.servers:*}'.split(',')}")
+  @Value("#{'${cactus.servers:}'}")
   private List<String> cactusServices;
 
   @Value("${cactus.auth.server:#{null}}")
@@ -35,10 +34,12 @@ public class TokenExchange {
   private final RestTemplate restTemplate;
 
   public Optional<String> getExchangedToken(String requestUrl) {
+    Preconditions.checkNotNull(
+        authServer,
+        "Property 'cactus.auth.server' must be defined");
+
     var cactusToken = tokenAuthenticationService.requireToken();
-    if (cactusServices == null ||
-        authServer == null ||
-        cactusServices.stream().anyMatch(requestUrl::startsWith)) {
+    if (cactusServices.stream().anyMatch(requestUrl::startsWith)) {
       return Optional.of(cactusToken);
     }
 

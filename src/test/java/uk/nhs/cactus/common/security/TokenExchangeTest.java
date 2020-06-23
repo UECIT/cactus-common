@@ -10,9 +10,12 @@ import static org.mockito.hamcrest.MockitoHamcrest.argThat;
 import static org.springframework.test.util.ReflectionTestUtils.setField;
 
 import java.net.URI;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -22,7 +25,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
-@SuppressWarnings("OptionalGetWithoutIsPresent")
+@SuppressWarnings({"OptionalGetWithoutIsPresent", "ConstantConditions"})
 @RunWith(MockitoJUnitRunner.class)
 public class TokenExchangeTest {
 
@@ -43,35 +46,56 @@ public class TokenExchangeTest {
   @InjectMocks
   private TokenExchange tokenExchange;
 
-  @Test(expected = NullPointerException.class)
+  @Rule
+  public ExpectedException expectedException = ExpectedException.none();
+
+  @Test
   public void getExchangedToken_withNullRequestUrl_shouldFail() {
     setField(tokenExchange, CACTUS_SERVICES, VALID_CACTUS_SERVICES);
     setField(tokenExchange, AUTH_SERVER, VALID_AUTH_SERVER);
     when(tokenAuthenticationService.requireToken()).thenReturn(VALID_TOKEN);
 
+    expectedException.expect(NullPointerException.class);
     tokenExchange.getExchangedToken(null);
   }
 
   @Test
-  public void getExchangedToken_withNullAuthServer_shouldReturnCactusToken() {
+  public void getExchangedToken_withNullAuthServer_shouldFail() {
     setField(tokenExchange, CACTUS_SERVICES, VALID_CACTUS_SERVICES);
     setField(tokenExchange, AUTH_SERVER, null);
-    when(tokenAuthenticationService.requireToken()).thenReturn(VALID_TOKEN);
 
-    var token = tokenExchange.getExchangedToken("cactus-ems");
-
-    assertThat(token.get(), is(VALID_TOKEN));
+    expectedException.expect(NullPointerException.class);
+    tokenExchange.getExchangedToken("cactus-ems");
   }
 
   @Test
-  public void getExchangedToken_withNullCactusServices_shouldReturnCactusToken() {
+  public void getExchangedToken_withNullCactusServices_shouldFail() {
     setField(tokenExchange, CACTUS_SERVICES, null);
     setField(tokenExchange, AUTH_SERVER, VALID_AUTH_SERVER);
     when(tokenAuthenticationService.requireToken()).thenReturn(VALID_TOKEN);
 
-    var token = tokenExchange.getExchangedToken("cactus-ems");
+    expectedException.expect(NullPointerException.class);
+    tokenExchange.getExchangedToken("cactus-ems");
+  }
 
-    assertThat(token.get(), is(VALID_TOKEN));
+  @Test
+  public void getExchangedToken_withEmptyCactusServices_shouldExchangeToken() {
+    setField(tokenExchange, CACTUS_SERVICES, Collections.emptyList());
+    setField(tokenExchange, AUTH_SERVER, VALID_AUTH_SERVER);
+    when(tokenAuthenticationService.requireToken()).thenReturn(VALID_TOKEN);
+
+    var expectedRequest = RequestEntity
+        .get(URI.create("http://cactus.auth/server/exchange?baseUrl=cactus-ems"))
+        .header("Authorization", "Bearer <validToken>")
+        .build();
+    var validResponse = ResponseEntity.ok("<exchangedToken>");
+
+    when(restTemplate.exchange(argThat(samePropertyValuesAs(expectedRequest)), eq(String.class)))
+        .thenReturn(validResponse);
+
+    var exchangedToken = tokenExchange.getExchangedToken("cactus-ems");
+
+    assertThat(exchangedToken.get(), is("<exchangedToken>"));
   }
 
   @Test

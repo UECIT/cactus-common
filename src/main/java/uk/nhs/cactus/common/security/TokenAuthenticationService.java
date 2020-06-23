@@ -53,6 +53,28 @@ public class TokenAuthenticationService {
   }
 
   /**
+   * Extracts the currently authenticated token from the {@link SecurityContextHolder}
+   *
+   * @return the token used from the current security context, or empty if not available
+   */
+  public Optional<String> getCurrentToken() {
+    return Optional.ofNullable(SecurityContextHolder.getContext().getAuthentication())
+        .map(Authentication::getCredentials)
+        .filter(CactusToken.class::isInstance)
+        .map(CactusToken.class::cast)
+        .map(CactusToken::getToken);
+  }
+
+  /**
+   * Requires that a supplier is currently authenticated
+   * @return currently authenticated token supplierId
+   * @throws {@link AuthenticationException} if not able to authenticate
+   */
+  public String requireToken() {
+    return getCurrentToken().orElseThrow(AuthenticationException::new);
+  }
+
+  /**
    * Extracts the currently authenticated supplier ID from the {@link SecurityContextHolder}
    *
    * @return the supplier ID from the current security context, or empty if not available

@@ -133,9 +133,15 @@ public class TokenAuthenticationServiceTest {
   }
 
   @Test(expected = AuthenticationException.class)
-  public void throwsAuthenticationExceptionWhenInvalidToken() {
+  public void throwsAuthenticationExceptionWhenGettingSupplierIdWithInvalidToken() {
     SecurityContextHolder.getContext().setAuthentication(null);
     authService.requireSupplierId();
+  }
+
+  @Test(expected = AuthenticationException.class)
+  public void throwsAuthenticationExceptionWhenWhenGettingTokenWithInvalidToken() {
+    SecurityContextHolder.getContext().setAuthentication(null);
+    authService.requireToken();
   }
 
 

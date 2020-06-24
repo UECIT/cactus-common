@@ -12,7 +12,6 @@ import static org.springframework.test.util.ReflectionTestUtils.setField;
 import java.net.URI;
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -20,6 +19,7 @@ import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.RequestEntity;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.HttpClientErrorException;
@@ -35,7 +35,6 @@ public class TokenExchangeTest {
   private static final List<String> VALID_CACTUS_SERVICES = List.of("cactus-ems", "cactus-cdss");
   private static final String VALID_AUTH_SERVER = "http://cactus.auth/server";
   private static final String VALID_TOKEN = "<validToken>";
-  private static final ResponseEntity<Object> VALID_RESPONSE = ResponseEntity.of(Optional.empty());
 
   @Mock
   private TokenAuthenticationService tokenAuthenticationService;
@@ -114,8 +113,15 @@ public class TokenExchangeTest {
     setField(tokenExchange, CACTUS_SERVICES, VALID_CACTUS_SERVICES);
     setField(tokenExchange, AUTH_SERVER, VALID_AUTH_SERVER);
     when(tokenAuthenticationService.requireToken()).thenReturn(VALID_TOKEN);
+
+    var validNotFoundException = HttpClientErrorException.create(
+        HttpStatus.NOT_FOUND,
+        null,
+        null,
+        null,
+        null);
     when(restTemplate.exchange(any(RequestEntity.class), eq(String.class)))
-        .thenThrow(HttpClientErrorException.NotFound.class);
+        .thenThrow(validNotFoundException);
 
     var token = tokenExchange.getExchangedToken("non-cactus-ems");
 

@@ -8,6 +8,7 @@ import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.RequestEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.HttpClientErrorException;
@@ -56,8 +57,13 @@ public class TokenExchange {
     try {
       String token = restTemplate.exchange(request, String.class).getBody();
       return Optional.ofNullable(trimToNull(token));
-    } catch (HttpClientErrorException.NotFound e) {
-      return Optional.empty();
+
+    } catch (HttpClientErrorException e) {
+      if (e.getStatusCode() == HttpStatus.NOT_FOUND) {
+        return Optional.empty();
+      }
+
+      throw e;
     }
   }
 

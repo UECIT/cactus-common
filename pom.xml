@@ -55,6 +55,18 @@
     </repository>
   </distributionManagement>
 
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>com.amazonaws</groupId>
+        <artifactId>aws-java-sdk-bom</artifactId>
+        <version>1.11.789</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
+
   <dependencies>
     <!-- Spring Dependencies -->
     <dependency>
@@ -111,6 +123,12 @@
       <groupId>uk.nhs.ctp</groupId>
       <artifactId>EMS-Fhir-Extensions</artifactId>
       <version>0.0.1</version>
+    </dependency>
+
+    <!-- AWS Dependencies -->
+    <dependency>
+      <groupId>com.amazonaws</groupId>
+      <artifactId>aws-java-sdk-sqs</artifactId>
     </dependency>
 
     <!-- Testing Dependencies -->

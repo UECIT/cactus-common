@@ -11,7 +11,7 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 @RequiredArgsConstructor
-public class AuditConfig {
+public class InterceptorConfig {
 
   private final List<IClientInterceptor> clientInterceptors;
   private final FhirContext fhirContext;

@@ -1,6 +1,5 @@
 package uk.nhs.cactus.common.audit.config;
 
-import java.time.Duration;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.Bean;
@@ -15,7 +14,8 @@ public class RestClientConfig {
     public RestTemplate auditRestTemplate() {
         // Currently only used for local-only services (i.e. audit server)
         // a timeout of 50 should be acceptable locally
-        var timeout = Duration.ofMillis(50);
+        var timeout = 50; // using deprecated methods for compatibility with the EMS
+        // (which is on an older spring boot version)
         return new RestTemplateBuilder()
                 .setConnectTimeout(timeout)
                 .setReadTimeout(timeout)

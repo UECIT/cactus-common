@@ -1,4 +1,4 @@
-package uk.nhs.cactus.common.audit.sqs;
+package uk.nhs.cactus.common.audit.sender;
 
 
 import uk.nhs.cactus.common.audit.model.AuditSession;

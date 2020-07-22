@@ -1,4 +1,4 @@
-package uk.nhs.cactus.common.audit.sqs;
+package uk.nhs.cactus.common.audit.sender;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;

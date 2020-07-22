@@ -1,4 +1,4 @@
-package uk.nhs.cactus.common.audit.sqs;
+package uk.nhs.cactus.common.audit.sender;
 
 import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 

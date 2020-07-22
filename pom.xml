@@ -18,6 +18,7 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     <hapi-fhir.version>4.1.0-uecdi</hapi-fhir.version>
+    <elastic-search-version>7.7.1</elastic-search-version>
   </properties>
 
   <repositories>
@@ -129,6 +130,16 @@
     <dependency>
       <groupId>com.amazonaws</groupId>
       <artifactId>aws-java-sdk-sqs</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.elasticsearch.client</groupId>
+      <artifactId>elasticsearch-rest-high-level-client</artifactId>
+      <version>${elastic-search-version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.elasticsearch</groupId>
+      <artifactId>elasticsearch</artifactId>
+      <version>${elastic-search-version}</version>
     </dependency>
 
     <!-- Testing Dependencies -->

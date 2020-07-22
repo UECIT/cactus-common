@@ -15,7 +15,7 @@ import org.springframework.web.util.ContentCachingResponseWrapper;
 import uk.nhs.cactus.common.audit.model.AuditSession;
 import uk.nhs.cactus.common.audit.model.HttpRequest;
 import uk.nhs.cactus.common.audit.model.HttpResponse;
-import uk.nhs.cactus.common.audit.sqs.AuditSender;
+import uk.nhs.cactus.common.audit.sender.AuditSender;
 
 @Component
 @RequiredArgsConstructor

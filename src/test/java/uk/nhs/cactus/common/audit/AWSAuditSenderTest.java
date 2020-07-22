@@ -26,7 +26,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.test.util.ReflectionTestUtils;
 import uk.nhs.cactus.common.audit.model.AuditEntry;
 import uk.nhs.cactus.common.audit.model.AuditSession;
-import uk.nhs.cactus.common.audit.sqs.AWSAuditSender;
+import uk.nhs.cactus.common.audit.sender.AWSAuditSender;
 import uk.nhs.cactus.common.security.TokenAuthenticationService;
 
 @RunWith(MockitoJUnitRunner.class)

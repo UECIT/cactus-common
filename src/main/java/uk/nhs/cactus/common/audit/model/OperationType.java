@@ -17,4 +17,7 @@ public enum OperationType {
     return name().toLowerCase();
   }
 
+  public static OperationType fromName(String name) {
+    return OperationType.valueOf(name.toUpperCase());
+  }
 }

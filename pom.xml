@@ -182,6 +182,11 @@
       <groupId>javax.xml.bind</groupId>
       <artifactId>jaxb-api</artifactId>
     </dependency>
+    <dependency>
+      <groupId>com.arakelian</groupId>
+      <artifactId>jackson-utils</artifactId>
+      <version>3.0.0</version>
+    </dependency>
   </dependencies>
 
   <build>

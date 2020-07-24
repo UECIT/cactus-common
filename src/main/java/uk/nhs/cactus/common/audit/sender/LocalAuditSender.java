@@ -30,10 +30,10 @@ public class LocalAuditSender implements AuditSender {
 
     @Override
     public void sendAudit(AuditSession audit) {
-        var supplierId = authenticationService.requireSupplierId();
+        var supplierId = authenticationService.getCurrentSupplierId().orElse("anonymous");
         var metadata = Map.of(
             "requestId", UUID.randomUUID(),
-            "@timestamp", Instant.now().toString(),
+            "@timestamp", Instant.now(),
             "@owner", serviceName);
 
         try {

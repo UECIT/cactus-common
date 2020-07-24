@@ -31,10 +31,9 @@ public class ElasticRestClientFactory {
 
     var baseClientBuilder = RestClient.builder(HttpHost.create(endpoint));
 
-    interceptor(endpoint)
-        .ifPresentOrElse(interceptor -> baseClientBuilder.setHttpClientConfigCallback(clientConfig ->
-            clientConfig.addInterceptorLast(interceptor)),
-            () -> log.info("Creating an ElasticSearchClient for a non-AWS endpoint"));
+    interceptor(endpoint).ifPresent(interceptor ->
+        baseClientBuilder.setHttpClientConfigCallback(clientConfig ->
+            clientConfig.addInterceptorLast(interceptor)));
 
     return new RestHighLevelClient(baseClientBuilder);
   }

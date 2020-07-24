@@ -39,7 +39,7 @@ public class ElasticSearchClient {
     var sourceMap = objectMapper.<Map<String, Object>>convertValue(source, typedReference);
 
     for (var entry : additionalProperties.entrySet()) {
-      sourceMap.merge(entry.getKey(), entry.getValue(), (v1, v2) -> v1);
+      sourceMap.merge(entry.getKey(), entry.getValue().toString(), (v1, v2) -> v1);
     }
 
     var request = Requests.indexRequest(index).source(sourceMap);

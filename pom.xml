@@ -4,7 +4,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>uk.nhs.cactus</groupId>
   <artifactId>common</artifactId>
-  <version>0.0.5.6</version>
+  <version>0.0.5.7</version>
   <packaging>jar</packaging>
 
   <parent>
@@ -18,6 +18,7 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     <hapi-fhir.version>4.1.0-uecdi</hapi-fhir.version>
+    <elastic-search-version>7.8.0</elastic-search-version>
   </properties>
 
   <repositories>
@@ -54,6 +55,23 @@
       <url>https://maven.pkg.github.com/UECIT/cactus-common</url>
     </repository>
   </distributionManagement>
+
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>com.amazonaws</groupId>
+        <artifactId>aws-java-sdk-bom</artifactId>
+        <version>1.11.789</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.elasticsearch</groupId>
+        <artifactId>elasticsearch</artifactId>
+        <version>${elastic-search-version}</version>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
 
   <dependencies>
     <!-- Spring Dependencies -->
@@ -113,6 +131,17 @@
       <version>0.0.1</version>
     </dependency>
 
+    <!-- AWS Dependencies -->
+    <dependency>
+      <groupId>com.amazonaws</groupId>
+      <artifactId>aws-java-sdk-sqs</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.elasticsearch.client</groupId>
+      <artifactId>elasticsearch-rest-high-level-client</artifactId>
+      <version>${elastic-search-version}</version>
+    </dependency>
+
     <!-- Testing Dependencies -->
     <dependency>
       <groupId>org.springframework.boot</groupId>
@@ -152,6 +181,11 @@
     <dependency>
       <groupId>javax.xml.bind</groupId>
       <artifactId>jaxb-api</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.arakelian</groupId>
+      <artifactId>jackson-utils</artifactId>
+      <version>3.0.0</version>
     </dependency>
   </dependencies>
 

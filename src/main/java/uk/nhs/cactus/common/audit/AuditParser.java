@@ -13,7 +13,7 @@ import org.springframework.stereotype.Component;
 public class AuditParser {
   public Map<String, Collection<String>> getHeadersFrom(String headers) {
     return Stream.of(headers.split("\n"))
-        .map(header -> header.split(":"))
+        .map(header -> header.split(":", 2))
         .filter(headerParts -> headerParts.length == 2)
         .collect(Collectors.toUnmodifiableMap(
             headerParts -> headerParts[0].toLowerCase(),

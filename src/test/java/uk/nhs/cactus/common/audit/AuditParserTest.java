@@ -29,7 +29,7 @@ public class AuditParserTest {
 
   @Test
   public void getHeadersFrom_withInvalidHeaders_shouldReturnEmpty() {
-    var headersString = "header1: [something]:somethingElse"
+    var headersString = "header1"
         + "\nheader2";
 
     var headers = auditParser.getHeadersFrom(headersString);

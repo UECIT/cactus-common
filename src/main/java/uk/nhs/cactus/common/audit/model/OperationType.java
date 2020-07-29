@@ -11,7 +11,7 @@ public enum OperationType {
   @JsonProperty("Is Valid") IS_VALID,
   @JsonProperty("Check Services") CHECK_SERVICES,
   @JsonProperty("Encounter Report") ENCOUNTER_REPORT,
-  @JsonProperty("Handover") HANDOVER;
+  @JsonProperty("Encounter Search") ENCOUNTER_SEARCH;
 
   public String getName() {
     return name().toLowerCase();
